@@ -1,0 +1,15 @@
+EXTI_PROGRAME.d EXTI_PROGRAME.o: .././EXTI_PROGRAME.c .././STD_TYPES.h \
+ .././ERROR_STATES.h .././BIT_MATH.h .././EXTI_PRIVATE.h \
+ .././EXTI_INTERFACE.h .././EXTI_CONFIG.h
+
+.././STD_TYPES.h:
+
+.././ERROR_STATES.h:
+
+.././BIT_MATH.h:
+
+.././EXTI_PRIVATE.h:
+
+.././EXTI_INTERFACE.h:
+
+.././EXTI_CONFIG.h:

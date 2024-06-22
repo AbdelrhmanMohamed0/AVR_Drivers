@@ -2,7 +2,7 @@
 #include "BIT_MATH.h"
 #include "ERROR_STATES.h"
 #include "DIO_INTERFACE.h"
-#include "LCD_INTERFACE"
+#include "LCD_INTERFACE.h"
 #include "LCD_PRIVATE.h"
 #include "LCD_CONFIG.h"
 #define F_CPU 8000000UL
@@ -194,6 +194,76 @@ ES_t LCD_enuSendNumber(s64 Copy_s64Number)
     Local_EnuErrorState = ES_OK;
 
     return Local_EnuErrorState;
+}
+
+void LCD_WriteNumberIn3Digits(s64 number)
+{
+	u8 digits[3] = {0} ;
+	u8 i = 0  ;
+	
+	if(number == 0)
+	{
+		for(i = 2 ; i >= 0 ; i--)
+		{
+			LCD_enuSendData('0') ;
+			if(i == 0)
+			break ;
+		}
+		return ;
+	}
+	if(number < 0)
+	{
+		number *= (-1) ;
+		LCD_enuSendData('-') ;
+	}
+	while(number && i < 3 )
+	{
+		digits[i] =  number % 10 ;
+		number /= 10 ;
+		i++ ;
+	}
+	for(i = 2 ; i >= 0 ; i--)
+	{
+		LCD_enuSendData(digits[i] + '0') ;
+		if(i == 0)
+		break ;
+	}
+	
+}
+
+void LCD_WriteNumberIn4Digits(s64 number)
+{
+	u8 digits[4] = {0} ;
+	u8 i = 0  ;
+	
+	if(number == 0)
+	{
+		for(i = 3 ; i >= 0 ; i--)
+		{
+			LCD_enuSendData('0') ;
+			if(i == 0)
+			break ;
+		}
+		return ;
+	}
+	if(number < 0)
+	{
+		number *= (-1) ;
+		LCD_enuSendData('-') ;
+	}
+	while(number && i < 4 )
+	{
+		digits[i] =  number % 10 ;
+		number /= 10 ;
+		i++ ;
+	}
+	for(i = 3 ; i >= 0 ; i--)
+	{
+		LCD_enuSendData(digits[i] + '0') ;
+		if(i == 0)
+		break ;
+	}
+	
 }
 
 ES_t LCD_enuSetPosition(u8 Copy_u8Row, u8 Copy_u8Col)

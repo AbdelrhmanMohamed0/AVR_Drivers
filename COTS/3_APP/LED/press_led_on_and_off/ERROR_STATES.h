@@ -5,7 +5,8 @@ typedef enum{
 ES_NOT_OK,
 ES_OK,
 ES_NULL_POINTER,
-ES_OUT_OF_RANGE
+ES_OUT_OF_RANGE,
+ES_NOT_CORRECT_MODE
 }ES_t;
 
 #endif

@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "error_states.h": "c",
+        "dio_interface.h": "c",
+        "std_types.h": "c",
+        "adc_interface.h": "c",
+        "timer_interface.h": "c",
+        "timers_services.h": "c",
+        "ultrasonic.h": "c"
+    }
+}

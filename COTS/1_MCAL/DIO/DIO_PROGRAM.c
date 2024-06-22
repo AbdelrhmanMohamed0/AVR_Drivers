@@ -5,6 +5,7 @@
 
 #include "DIO_PRIVATE.h"
 #include "DIO_CONFIG.h"
+#include "DIO_INTERFACE.h"
 
 ES_t DIO_Enu_Init(void)
 {

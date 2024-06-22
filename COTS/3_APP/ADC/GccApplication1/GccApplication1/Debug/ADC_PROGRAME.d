@@ -1,0 +1,15 @@
+ADC_PROGRAME.d ADC_PROGRAME.o: .././ADC_PROGRAME.c .././STD_TYPES.h \
+ .././BIT_MATH.h .././ERROR_STATES.h .././ADC_INTERFACE.h \
+ .././ADC_CONFIG.h .././ADC_PRIVATE.h
+
+.././STD_TYPES.h:
+
+.././BIT_MATH.h:
+
+.././ERROR_STATES.h:
+
+.././ADC_INTERFACE.h:
+
+.././ADC_CONFIG.h:
+
+.././ADC_PRIVATE.h:

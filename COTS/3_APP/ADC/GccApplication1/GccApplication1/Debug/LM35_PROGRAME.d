@@ -1,0 +1,17 @@
+LM35_PROGRAME.d LM35_PROGRAME.o: .././LM35_PROGRAME.c .././STD_TYPES.h \
+ .././BIT_MATH.h .././ERROR_STATES.h .././DIO_INTERFACE.h \
+ .././ADC_INTERFACE.h .././LM35_INTERFACE.h .././LM35_PRIVATE.h
+
+.././STD_TYPES.h:
+
+.././BIT_MATH.h:
+
+.././ERROR_STATES.h:
+
+.././DIO_INTERFACE.h:
+
+.././ADC_INTERFACE.h:
+
+.././LM35_INTERFACE.h:
+
+.././LM35_PRIVATE.h:

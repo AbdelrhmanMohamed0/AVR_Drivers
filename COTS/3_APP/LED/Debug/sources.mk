@@ -20,5 +20,5 @@ C_DEPS :=
 
 # Every subdirectory with source files must be described here
 SUBDIRS := \
-. \
+press_led_on_and_off \
 

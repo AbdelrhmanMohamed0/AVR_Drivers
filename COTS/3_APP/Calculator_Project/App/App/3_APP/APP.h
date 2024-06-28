@@ -7,6 +7,8 @@
 #include "..\2_HAL\KEYPAD\KEYPAD_INTERFACE.h"
 #include <math.h>
 #include <string.h>
+#define F_CPU 8000000
+#include <util/delay.h>
 void Infix_To_Postfix(u8 *array, Stack *postfix);
 void display(ELEMENT_TYPE ch);
 int Is_digit(u8 ch);
@@ -18,5 +20,15 @@ void reverse(char *str, int len);
 int intToStr(int x, char str[], int d);
 void ftoa(float n, char *res, int afterpoint);
 u8 Mode1(void);
+void decimal_to_binary(void);
+void decimal_to_decimal(void);
+void decimal_to_HEX(void);
+void binary_to_decimal(void);
+void binary_to_binary(void);
+void binary_to_HEX(void);
+void HEX_to_decimal(void);
+void HEX_to_binary(void);
+void HEX_to_HEX(void);
+void hex_to_binary(char hex_char, char *binary_string);
 void Mode2(void);
 void Mode3(void);

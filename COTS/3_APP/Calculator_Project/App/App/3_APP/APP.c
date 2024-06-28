@@ -1,4 +1,5 @@
 #include "APP.h"
+u8 array_num[16], flag1 = 0;
 // A utility function to reverse a string
 void reverse(char *str, int len)
 {
@@ -213,6 +214,11 @@ u8 Mode1(void)
 	Stack s1, s2;
 	stack_init(&s1);
 	stack_init(&s2);
+	if (flag1 == 1)
+	{
+		LCD_enuClearScreen();
+		flag1 = 0;
+	}
 	LCD_enuSendCommand(lcd_DisplayOn_CursorOn);
 	LCD_enuSetPosition(1, 1);
 	do
@@ -315,8 +321,8 @@ u8 Mode1(void)
 	} while (pressed_key != '=');
 	count = strlen(array);
 	array[count] = '\0';
-	if(count==0)
-	return 0;
+	if (count == 0)
+		return 0;
 	if (strlen(array) == 1)
 	{
 		if (array[0] == '*' || array[0] == '/' || array[0] == '^' || array[0] == '-' || array[0] == '+')
@@ -430,7 +436,7 @@ u8 Mode1(void)
 	}
 	for (s8 i = 0; i <= count - 5; i++)
 	{
-		if ((Is_digit(array[i]) && Is_digit(array[i + 1]) && Is_digit(array[i + 2]) && Is_digit(array[i + 3]) && Is_digit(array[i + 4])&&(array[i]>'5')))
+		if ((Is_digit(array[i]) && Is_digit(array[i + 1]) && Is_digit(array[i + 2]) && Is_digit(array[i + 3]) && Is_digit(array[i + 4]) && (array[i] > '5')))
 		{
 			LCD_enuClearScreen();
 			LCD_enuSetPosition(1, 1);
@@ -474,9 +480,540 @@ u8 Mode1(void)
 }
 void Mode2(void)
 {
+	u8 pressed_key, convert_from, convert_to;
 	LCD_enuClearScreen();
+	LCD_enuSetPosition(1, 1);
+	LCD_enuSendString("convert from : ");
+	LCD_enuSetPosition(2, 1);
+	LCD_enuSendString("1D   2B   3H ");
+	do
+	{
+		KPD_enu_GetPressed(&pressed_key);
+	} while (pressed_key != '1' && pressed_key != '2' && pressed_key != '3');
+	convert_from = pressed_key;
+	LCD_enuClearScreen();
+	LCD_enuSetPosition(1, 1);
+	LCD_enuSendString("convert to : ");
+	LCD_enuSetPosition(2, 1);
+	LCD_enuSendString("1D   2B   3H");
+	do
+	{
+		KPD_enu_GetPressed(&pressed_key);
+	} while (pressed_key != '1' && pressed_key != '2' && pressed_key != '3');
+	convert_to = pressed_key;
+	for (int i = 0; i < 999; i++)
+		;
+	switch (convert_from)
+	{
+	case '1':
+		switch (convert_to)
+		{
+		case '1':
+			decimal_to_decimal();
+			break;
+		case '2':
+			decimal_to_binary();
+			break;
+		case '3':
+			decimal_to_HEX();
+			break;
+		}
+		break;
+	case '2':
+		switch (convert_to)
+		{
+		case '1':
+			binary_to_decimal();
+			break;
+		case '2':
+			binary_to_binary();
+			break;
+		case '3':
+			binary_to_HEX();
+			break;
+		}
+		break;
+	case '3':
+	{
+		switch (convert_to)
+		{
+		case '1':
+			HEX_to_decimal();
+			break;
+		case '2':
+			HEX_to_binary();
+			break;
+		case '3':
+			HEX_to_HEX();
+			break;
+		}
+	}
+	break;
+	}
+	LCD_enuSetPosition(1, 1);
+	LCD_enuSendString("C- mode continue ");
+	LCD_enuSetPosition(2, 1);
+	LCD_enuSendString("M- change mode ");
+	do
+	{
+		KPD_enu_GetPressed(&pressed_key);
+	} while (pressed_key != 'C' && pressed_key != 'M');
+	flag1 = 1;
 }
+
+void decimal_to_decimal(void)
+{
+	u8 pressed_key, i = 0;
+	LCD_enuClearScreen();
+	do
+	{
+		do
+		{
+			KPD_enu_GetPressed(&pressed_key);
+		} while ((pressed_key < '0' || pressed_key > '9') && pressed_key != '=');
+		if (pressed_key == '=')
+			continue;
+		LCD_enuSendData(pressed_key);
+		array_num[i++] = pressed_key;
+	} while (pressed_key != '=');
+	array_num[i] = '\0';
+	LCD_enuClearScreen();
+	LCD_enuSendString(array_num);
+	LCD_enuSetPosition(2, 1);
+	LCD_enuSendString("C-Finish read");
+	do
+	{
+		KPD_enu_GetPressed(&pressed_key);
+	} while (pressed_key != 'C' && pressed_key != 'M');
+}
+
+void decimal_to_binary(void)
+{
+	u8 pressed_key, i = 0;
+	u32 decimal_number = 0, index = 0;
+	u8 binary_number[32] = {0}; // Assuming a maximum of 32 bits for simplicity
+
+	LCD_enuClearScreen();
+	do
+	{
+		do
+		{
+			KPD_enu_GetPressed(&pressed_key);
+		} while ((pressed_key < '0' || pressed_key > '9') && pressed_key != '=');
+		if (pressed_key == '=')
+			continue;
+		LCD_enuSendData(pressed_key);
+		array_num[i++] = pressed_key;
+	} while (pressed_key != '=');
+	array_num[i] = '\0';
+	LCD_enuClearScreen();
+	decimal_number = atoi(array_num);
+	if (decimal_number == 0)
+	{
+		LCD_enuSendNumber(0);
+		return;
+	}
+	while (decimal_number > 0)
+	{
+		binary_number[index] = decimal_number % 2;
+		decimal_number = decimal_number / 2;
+		index++;
+	}
+
+	// Print binary number in reverse order
+	for (int i = index - 1; i >= 0; i--)
+	{
+		LCD_enuSendNumber(binary_number[i]);
+	}
+	LCD_enuSetPosition(2, 1);
+	LCD_enuSendString("C-Finish read");
+	do
+	{
+		KPD_enu_GetPressed(&pressed_key);
+	} while (pressed_key != 'C' && pressed_key != 'M');
+}
+
+void decimal_to_HEX(void)
+{
+	u8 pressed_key, i = 0, flag = 0;
+	u32 decimal_number = 0, index = 0;
+	u8 hex_number[32] = {0}; // Assuming a maximum of 32 bits for simplicity
+	LCD_enuClearScreen();
+	do
+	{
+		do
+		{
+			KPD_enu_GetPressed(&pressed_key);
+		} while ((pressed_key < '0' || pressed_key > '9') && pressed_key != '=');
+		if (pressed_key == '=')
+			continue;
+		LCD_enuSendData(pressed_key);
+		array_num[i++] = pressed_key;
+	} while (pressed_key != '=');
+	array_num[i] = '\0';
+	LCD_enuClearScreen();
+	decimal_number = atoi(array_num);
+	if (decimal_number == 0)
+	{
+		LCD_enuSendNumber(0);
+		return;
+	}
+	while (decimal_number > 0)
+	{
+		u32 rem = decimal_number % 16;
+		if (rem < 10)
+			hex_number[index] = rem + '0';
+		else
+			hex_number[index] = rem - 10 + 'A';
+		decimal_number = decimal_number / 16;
+		index++;
+	}
+
+	// Print hex number in reverse order
+	for (int i = index - 1; i >= 0; i--)
+	{
+		LCD_enuSendData(hex_number[i]);
+	}
+	LCD_enuSetPosition(2, 1);
+	LCD_enuSendString("C-Finish read");
+	do
+	{
+		KPD_enu_GetPressed(&pressed_key);
+	} while (pressed_key != 'C' && pressed_key != 'M');
+}
+
+void binary_to_binary(void)
+{
+	u8 pressed_key, i = 0;
+	LCD_enuClearScreen();
+	do
+	{
+		do
+		{
+			KPD_enu_GetPressed(&pressed_key);
+		} while ((pressed_key != '0' && pressed_key != '1') && pressed_key != '=');
+		if (pressed_key == '0')
+			LCD_enuSendData('0');
+		else if (pressed_key == '1')
+			LCD_enuSendData('1');
+		array_num[i++] = pressed_key;
+	} while (pressed_key != '=');
+	array_num[--i] = '\0';
+	LCD_enuClearScreen();
+	LCD_enuSendString(array_num);
+	LCD_enuSetPosition(2, 1);
+	LCD_enuSendString("C-Finish read");
+	do
+	{
+		KPD_enu_GetPressed(&pressed_key);
+	} while (pressed_key != 'C' && pressed_key != 'M');
+}
+
+void binary_to_decimal(void)
+{
+	u8 pressed_key, j = 0;
+	u32 decimal_number = 0;
+	LCD_enuClearScreen();
+	do
+	{
+		do
+		{
+			KPD_enu_GetPressed(&pressed_key);
+		} while ((pressed_key != '0' && pressed_key != '1') && pressed_key != '=');
+		LCD_enuSendData(pressed_key);
+		array_num[j++] = pressed_key;
+	} while (pressed_key != '=');
+	array_num[--j] = '\0';
+	for (int i = 0; i < j; i++)
+	{
+		if (array_num[j - i - 1] == '1')
+		{
+			decimal_number += (1 << i);
+		}
+	}
+	LCD_enuClearScreen();
+	LCD_enuSendNumber(decimal_number);
+	LCD_enuSetPosition(2, 1);
+	LCD_enuSendString("C-Finish read");
+	do
+	{
+		KPD_enu_GetPressed(&pressed_key);
+	} while (pressed_key != 'C' && pressed_key != 'M');
+}
+
+void binary_to_HEX(void)
+{
+	u8 pressed_key, j = 0;
+	u32 decimal_number = 0, index = 0;
+	u8 hex_number[32] = {0}; // Assuming a maximum of 32 bits for simplicity
+
+	LCD_enuClearScreen();
+	do
+	{
+		do
+		{
+			KPD_enu_GetPressed(&pressed_key);
+		} while ((pressed_key != '0' && pressed_key != '1') && pressed_key != '=');
+		LCD_enuSendData(pressed_key);
+		array_num[j++] = pressed_key;
+	} while (pressed_key != '=');
+	array_num[--j] = '\0';
+	for (int i = 0; i < j; i++)
+	{
+		if (array_num[j - i - 1] == '1')
+		{
+			decimal_number += (1 << i);
+		}
+	}
+	while (decimal_number > 0)
+	{
+		u32 rem = decimal_number % 16;
+		if (rem < 10)
+			hex_number[index] = rem + '0';
+		else
+			hex_number[index] = rem - 10 + 'A';
+		decimal_number = decimal_number / 16;
+		index++;
+	}
+	LCD_enuClearScreen();
+	// Print hex number in reverse order
+	for (int i = index - 1; i >= 0; i--)
+	{
+		LCD_enuSendData(hex_number[i]);
+	}
+	LCD_enuSetPosition(2, 1);
+	LCD_enuSendString("C-Finish read");
+	do
+	{
+		KPD_enu_GetPressed(&pressed_key);
+	} while (pressed_key != 'C' && pressed_key != 'M');
+}
+
+void HEX_to_HEX(void)
+{
+	u8 pressed_key, i = 0, flag = 0;
+	LCD_enuClearScreen();
+	LCD_enuSetPosition(1, 1);
+	LCD_enuSendString("G- Before NUM to");
+	LCD_enuSetPosition(2, 1);
+	LCD_enuSendString("Write Alphabet");
+	_delay_ms(500);
+	LCD_enuClearScreen();
+	do
+	{
+		do
+		{
+			KPD_enu_GetPressed(&pressed_key);
+		} while ((pressed_key < '1' || pressed_key > '9') && pressed_key != '=' && pressed_key != 'G');
+		if (pressed_key == 'G')
+		{
+			flag = 1;
+			continue;
+		}
+		if (pressed_key == '=')
+			continue;
+		if (flag == 1)
+		{
+			LCD_enuSendData(pressed_key + 16);
+			array_num[i++] = pressed_key + 16;
+			flag = 0;
+		}
+		else
+		{
+			LCD_enuSendData(pressed_key);
+			array_num[i++] = pressed_key;
+		}
+	} while (pressed_key != '=');
+	array_num[i] = '\0';
+	LCD_enuClearScreen();
+	LCD_enuSendString(array_num);
+	LCD_enuSetPosition(2, 1);
+	LCD_enuSendString("C-Finish read");
+	do
+	{
+		KPD_enu_GetPressed(&pressed_key);
+	} while (pressed_key != 'C' && pressed_key != 'M');
+}
+
+void HEX_to_decimal(void)
+{
+
+	u8 pressed_key, j = 0, flag = 0;
+	u32 decimal_number = 0;
+	LCD_enuClearScreen();
+	LCD_enuSetPosition(1, 1);
+	LCD_enuSendString("G- Before NUM to");
+	LCD_enuSetPosition(2, 1);
+	LCD_enuSendString("Write Alphabet");
+	_delay_ms(500);
+	LCD_enuClearScreen();
+	do
+	{
+		do
+		{
+			KPD_enu_GetPressed(&pressed_key);
+		} while ((pressed_key < '1' || pressed_key > '9') && pressed_key != '=' && pressed_key != 'G');
+		if (pressed_key == 'G')
+		{
+			flag = 1;
+			continue;
+		}
+		if (pressed_key == '=')
+			continue;
+		if (flag == 1)
+		{
+			LCD_enuSendData(pressed_key + 16);
+			array_num[j++] = pressed_key + 16;
+			flag = 0;
+		}
+		else
+		{
+			LCD_enuSendData(pressed_key);
+			array_num[j++] = pressed_key;
+		}
+	} while (pressed_key != '=');
+	array_num[j] = '\0';
+	LCD_enuClearScreen();
+	for (int i = 0; i < j; i++)
+	{
+		u8 digit = array_num[j - i - 1];
+		if (Is_digit(digit))
+		{
+			decimal_number += (digit - '0') * (1 << (4 * i));
+		}
+		else if (isxdigit(digit))
+		{
+			decimal_number += (digit - 'A' + 10) * (1 << (4 * i));
+		}
+	}
+	LCD_enuSendNumber(decimal_number);
+	LCD_enuSetPosition(2, 1);
+	LCD_enuSendString("C-Finish read");
+	do
+	{
+		KPD_enu_GetPressed(&pressed_key);
+	} while (pressed_key != 'C' && pressed_key != 'M');
+}
+void HEX_to_binary(void)
+{
+	u8 pressed_key, j = 0, flag = 0;
+	u8 binary_number[128] = {0}; // Ensure enough space for binary output (4 bits per hex digit)
+	u8 binary_string[5] = {0};	 // Temporary storage for binary conversion of a single hex digit
+	LCD_enuClearScreen();
+	LCD_enuSetPosition(1, 1);
+	LCD_enuSendString("G- Before NUM to");
+	LCD_enuSetPosition(2, 1);
+	LCD_enuSendString("Write Alphabet");
+	_delay_ms(500);
+	LCD_enuClearScreen();
+	do
+	{
+		do
+		{
+			KPD_enu_GetPressed(&pressed_key);
+		} while ((pressed_key < '1' || pressed_key > '9') && pressed_key != '=' && pressed_key != 'G');
+		if (pressed_key == 'G')
+		{
+			flag = 1;
+			continue;
+		}
+		if (pressed_key == '=')
+			continue;
+		if (flag == 1)
+		{
+			LCD_enuSendData(pressed_key + 16);
+			array_num[j++] = pressed_key + 16;
+			flag = 0;
+		}
+		else
+		{
+			LCD_enuSendData(pressed_key);
+			array_num[j++] = pressed_key;
+		}
+	} while (pressed_key != '=');
+	array_num[j] = '\0';
+	LCD_enuClearScreen();
+	for (int i = 0; i < j; i++)
+	{
+		hex_to_binary(array_num[i], binary_string);
+		strcat(binary_number, binary_string);
+	}
+	LCD_enuSendString(binary_number);
+	LCD_enuSetPosition(2, 1);
+	LCD_enuSendString("C-Finish read");
+	do
+	{
+		KPD_enu_GetPressed(&pressed_key);
+	} while (pressed_key != 'C' && pressed_key != 'M');
+}
+void hex_to_binary(char hex_char, char *binary_string)
+{
+	switch (toupper(hex_char))
+	{
+	case '0':
+		strcpy(binary_string, "0000");
+		break;
+	case '1':
+		strcpy(binary_string, "0001");
+		break;
+	case '2':
+		strcpy(binary_string, "0010");
+		break;
+	case '3':
+		strcpy(binary_string, "0011");
+		break;
+	case '4':
+		strcpy(binary_string, "0100");
+		break;
+	case '5':
+		strcpy(binary_string, "0101");
+		break;
+	case '6':
+		strcpy(binary_string, "0110");
+		break;
+	case '7':
+		strcpy(binary_string, "0111");
+		break;
+	case '8':
+		strcpy(binary_string, "1000");
+		break;
+	case '9':
+		strcpy(binary_string, "1001");
+		break;
+	case 'A':
+		strcpy(binary_string, "1010");
+		break;
+	case 'B':
+		strcpy(binary_string, "1011");
+		break;
+	case 'C':
+		strcpy(binary_string, "1100");
+		break;
+	case 'D':
+		strcpy(binary_string, "1101");
+		break;
+	case 'E':
+		strcpy(binary_string, "1110");
+		break;
+	case 'F':
+		strcpy(binary_string, "1111");
+		break;
+	default:
+		strcpy(binary_string, "");
+		break; // Handle invalid input
+	}
+}
+
 void Mode3(void)
 {
+	// make game on lcd and keypad
+	u8 pressed_key;
 	LCD_enuClearScreen();
+	LCD_enuSetPosition(1, 1);
+	LCD_enuSendString("Game mode ");
+	do
+	{
+		KPD_enu_GetPressed(&pressed_key);
+	} while (pressed_key == 0xFF);
+	flag1 = 1;
 }
